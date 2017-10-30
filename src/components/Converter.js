@@ -14,6 +14,18 @@ class Converter extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleSwitch = this.handleSwitch.bind(this);
+    this.convert = this.convert.bind(this);
+  }
+
+  convert() {
+    if (this.state.from === this.state.to) {
+      this.setState({ result: this.state.value });
+    } else {
+      this.props.convert(this.state.value, this.state.from, this.state.to)
+      .then((result) => this.setState({ result: result }))
+      .catch((error) => console.log(error))
+    }
   }
 
   handleChange(event) {
@@ -23,13 +35,13 @@ class Converter extends Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    if (this.state.from === this.state.to) {
-      this.setState({ result: this.state.value });
-    } else {
-      this.props.convert(this.state.value, this.state.from, this.state.to)
-      .then((result) => this.setState({ result: result }))
-      .catch((error) => console.log(error))
-    }
+    this.convert();
+  }
+
+  handleSwitch(event) {
+    event.preventDefault();
+
+    this.setState({ from: this.state.to, to: this.state.from }, () => this.convert());
   }
 
   render() {
@@ -42,6 +54,7 @@ class Converter extends Component {
       <form onSubmit={this.handleSubmit}>
         <input name="value" value={this.state.value} onChange={this.handleChange}/>
         <select name="from" value={this.state.from} onChange={this.handleChange}>{listOptions}</select>
+        <button onClick={this.handleSwitch}>Switch</button>
         <select name="to" value={this.state.to} onChange={this.handleChange}>{listOptions}</select>
         <button type="submit">Convertir</button>
         <span>{this.state.result}</span>
