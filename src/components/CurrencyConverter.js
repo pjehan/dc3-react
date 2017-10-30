@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Converter from './Converter'
+import Converter from './Converter';
 
 class CurrencyConverter extends Component {
 
@@ -21,8 +21,21 @@ class CurrencyConverter extends Component {
     })
   }
 
+  convert(value, from, to) {
+    return new Promise((resolve, reject) => {
+      fetch('http://api.fixer.io/latest?base=' + from)
+      .then((response) => response.json())
+      .then((responseJson) => {
+        var result = responseJson.rates[to] * value;
+        resolve(result);
+      })
+      .catch((error) => reject(error))
+    });
+  }
+
   render() {
-    return (<Converter units={this.state.units}/>);
+    const defaultValues = { value: 1, from: 'EUR', to: 'USD' };
+    return (<Converter units={this.state.units} convert={this.convert} defaultValues={defaultValues}/>);
   }
 
 }

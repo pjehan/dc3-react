@@ -5,7 +5,12 @@ class Converter extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { value: 1, from: 'EUR', to: 'USD', result: '' };
+    this.state = {
+      value: this.props.defaultValues.value,
+      from: this.props.defaultValues.from,
+      to: this.props.defaultValues.to,
+      result: ''
+    };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -18,12 +23,13 @@ class Converter extends Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    fetch('http://api.fixer.io/latest?base=' + this.state.from)
-    .then((response) => response.json())
-    .then((responseJson) => {
-      var result = responseJson.rates[this.state.to] * this.state.value;
-      this.setState({ result: result });
-    })
+    if (this.state.from === this.state.to) {
+      this.setState({ result: this.state.value });
+    } else {
+      this.props.convert(this.state.value, this.state.from, this.state.to)
+      .then((result) => this.setState({ result: result }))
+      .catch((error) => console.log(error))
+    }
   }
 
   render() {
